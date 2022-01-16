@@ -19,17 +19,17 @@ public class Device : IDisposable
 
     public void MoveNext()
     {
-        if (Row > Configuration.Height)
-        {
-            throw new InvalidOperationException();
-        }
-        
         Column += _way;
-        if (Column > Configuration.Width || Column < 0)
+        if (Column is > Configuration.Width or < 0)
         {
             _way = -_way;
             Column += _way;
             Row++;
+        }
+        
+        if (Row > Configuration.Height)
+        {
+            throw new InvalidOperationException();
         }
     }
 
