@@ -12,7 +12,7 @@ public class Device : IDisposable
 
     public Device(string name)
     {
-        _port = new SerialPort(name);
+        _port = new SerialPort(name, Configuration.ReaderSpeed);
     }
 
     public void Start() => _port.Open();
