@@ -12,5 +12,5 @@ public struct RawDataPoint
     public int Y { get; set; }
 
     [Key(2)]
-    public ushort Data { get; set; }
+    public ushort[] Data { get; set; }
 }

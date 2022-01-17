@@ -5,23 +5,24 @@ namespace Kamera;
 
 public class ImageGenerator
 {
-    private ImageProcessingStatus _status;
-    private Device _device;
+    private ImageProcessingStatus _status = ImageProcessingStatus.NotStarted;
     private int _points = 0;
 
     public ImageGenerator()
     {
-        _device = new Device(Configuration.Port);
+        Program.Reader = new Device(Configuration.Port);
     }
 
     public void StartProcessing()
     {
         if (_status != ImageProcessingStatus.InProgress)
         {
-            _device.Reset();
+            Program.Reader.Reset();
             _status = ImageProcessingStatus.InProgress;
-            _device.Start();
-            new Thread(Process).Start();
+            Program.Reader.Start();
+            var processor = new Thread(Process);
+            processor.Name = "ImageGenerator";
+            processor.Start();
         }
     }
     
@@ -36,8 +37,8 @@ public class ImageGenerator
         {
             while (_points < Configuration.Width * Configuration.Height)
             {
-                image[_device.Column, _device.Row] = HeatMap(GetValue());
-                _device.MoveNext();
+                image[Program.Reader.Column, Program.Reader.Row] = HeatMap(GetValue());
+                Program.Reader.MoveNext();
                 _points++;
             }
             image.SaveAsPng("image.png");
@@ -49,7 +50,7 @@ public class ImageGenerator
         ulong reading = 0;
         for (int i = 0; i < Configuration.ReadingsPerPoint; i++)
         {
-            reading += _device.Read();
+            reading += Program.Reader.Read();
         }
 
         reading /= Configuration.ReadingsPerPoint;
@@ -72,8 +73,8 @@ public class ImageGenerator
     {
         return new ImageGenerationProgress
         {
-            CurrentRow = _device.Row,
-            CurrentColumn = _device.Column,
+            CurrentRow = Program.Reader.Row,
+            CurrentColumn = Program.Reader.Column,
             Status = _status,
             Percentage =  (int)((double)_points / (Configuration.Width * Configuration.Height) * 100),
             Time = DateTime.Now

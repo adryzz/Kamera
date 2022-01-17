@@ -2,7 +2,7 @@ namespace Kamera;
 
 public class Configuration
 {
-    public const byte BitDepth = 12;
+    public const byte BitDepth = 16;
     
     public static readonly Type DataPoint = typeof(ushort);
 
@@ -11,5 +11,5 @@ public class Configuration
     public const int ReadingsPerPoint = 256;
     public const int ReaderSpeed = 115200;
 
-    public static readonly string Port = "/dev/ttyS0";
+    public static readonly string Port = "/dev/ttyACM0";
 }

@@ -17,18 +17,47 @@ public class AntennaController : ControllerBase
     [HttpPost("[action]")]
     public DataPoint GetPoint([FromHeader] int x, [FromHeader] int y)
     {
-        return new DataPoint();
+        ulong reading = 0;
+        for (int i = 0; i < Configuration.ReadingsPerPoint; i++)
+        {
+            reading += Program.Reader.Read();
+        }
+
+        reading /= Configuration.ReadingsPerPoint;
+        
+        return new DataPoint
+        {
+            Data = (ushort)reading,
+            X = Program.Reader.Column,
+            Y = Program.Reader.Row
+        };
     }
     
     [HttpPost("[action]")]
     public RawDataPoint GetRawPoint([FromHeader] int x, [FromHeader] int y)
     {
-        return new RawDataPoint();
+        ushort[] readings = new ushort[Configuration.ReadingsPerPoint];
+        for (int i = 0; i < Configuration.ReadingsPerPoint; i++)
+        {
+            readings[i]= Program.Reader.Read();
+        }
+
+        return new RawDataPoint()
+        {
+            Data = readings,
+            X = Program.Reader.Column,
+            Y = Program.Reader.Row
+        };
     }
     
     [HttpPost("[action]")]
     public DataPoint GetSinglePoint([FromHeader] int x, [FromHeader] int y)
     {
-        return new DataPoint();
+        return new DataPoint
+        {
+            Data = Program.Reader.Read(),
+            X = Program.Reader.Column,
+            Y = Program.Reader.Row
+        };
     }
 }

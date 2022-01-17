@@ -31,36 +31,23 @@ public class Device : IDisposable
         {
             throw new InvalidOperationException();
         }
-        //SendPacket(BitConverter.GetBytes(Column), BitConverter.GetBytes(Row));
     }
 
     public void Reset()
     {
         Row = 0;
         Column = 0;
-        //SendPacket(BitConverter.GetBytes(Column), BitConverter.GetBytes(Row));
     }
 
     public ushort Read()
     {
-        byte[] packet = SendPacket(0, 0, 0);
-        return BitConverter.ToUInt16(packet, 1);
-    }
-
-    private byte[] SendPacket(params byte[] packet)
-    {
-        _port.Write(packet, 0, packet.Length);
-        byte[] p = new byte[3];
+        _port.Write(new byte[] { 0 }, 0, 1);
         
-        for(int i = 0; i < p.Length; i++)
-        {
-            int read = _port.ReadByte();
-            if (read == -1)
-                throw new InvalidOperationException();
+        Thread.Sleep(10);
 
-            p[i] = (byte) read;
-        }
-        return p;
+        byte[] packet = new byte[2];
+        _port.Read(packet, 0, 2);
+        return BitConverter.ToUInt16(packet);
     }
 
     public void Dispose()
