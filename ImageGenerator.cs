@@ -5,7 +5,7 @@ namespace Kamera;
 
 public class ImageGenerator
 {
-    private bool _started = false;
+    private ImageProcessingStatus _status;
     private Device _device;
     private int _points = 0;
 
@@ -16,9 +16,11 @@ public class ImageGenerator
 
     public void StartProcessing()
     {
-        if (!_started)
+        if (_status != ImageProcessingStatus.InProgress)
         {
-            _started = true;
+            _device.Reset();
+            _status = ImageProcessingStatus.InProgress;
+            _device.Start();
             new Thread(Process).Start();
         }
     }
@@ -34,15 +36,28 @@ public class ImageGenerator
         {
             while (_points < Configuration.Width * Configuration.Height)
             {
-                image[_device.Column, _device.Row] = HeatMap(_device.Read());
+                image[_device.Column, _device.Row] = HeatMap(GetValue());
                 _device.MoveNext();
                 _points++;
             }
             image.SaveAsPng("image.png");
         }
     }
+
+    private ushort GetValue()
+    {
+        ulong reading = 0;
+        for (int i = 0; i < Configuration.ReadingsPerPoint; i++)
+        {
+            reading += _device.Read();
+        }
+
+        reading /= Configuration.ReadingsPerPoint;
+
+        return (ushort)reading;
+    }
     
-    public Rgb48 HeatMap(ushort value)
+    private Rgb48 HeatMap(ushort value)
     {
         double val = value / (double)ushort.MaxValue;
         return new Rgb48()
@@ -59,7 +74,7 @@ public class ImageGenerator
         {
             CurrentRow = _device.Row,
             CurrentColumn = _device.Column,
-            Started = _started,
+            Status = _status,
             Percentage =  (int)((double)_points / (Configuration.Width * Configuration.Height) * 100),
             Time = DateTime.Now
         };

@@ -2,7 +2,7 @@ namespace Kamera;
 
 public class ImageGenerationProgress
 {
-    public bool Started { get; set; }
+    public ImageProcessingStatus Status { get; set; }
     
     public int CurrentRow { get; set; }
     
