@@ -41,6 +41,7 @@ public class Device : IDisposable
 
     public ushort Read()
     {
+        return (ushort) Random.Shared.Next(ushort.MinValue, ushort.MaxValue);
         _port.Write(new byte[] { 0 }, 0, 1);
         
         Thread.Sleep(10);

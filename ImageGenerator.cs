@@ -37,7 +37,7 @@ public class ImageGenerator
         {
             while (_points < Configuration.Width * Configuration.Height)
             {
-                image[Program.Reader.Column, Program.Reader.Row] = HeatMap(GetValue());
+                image[Program.Reader.Column, Program.Reader.Row] = HeatmapUtils.GetColor(GetValue());
                 Program.Reader.MoveNext();
                 _points++;
             }
@@ -57,18 +57,7 @@ public class ImageGenerator
 
         return (ushort)reading;
     }
-    
-    private Rgb48 HeatMap(ushort value)
-    {
-        double val = value / (double)ushort.MaxValue;
-        return new Rgb48()
-        {
-            R = Convert.ToUInt16(ushort.MaxValue * val),
-            G = 0,
-            B = Convert.ToUInt16(ushort.MaxValue * (1-val))
-        };
-    }
-    
+
     public ImageGenerationProgress GetProgress()
     {
         return new ImageGenerationProgress
